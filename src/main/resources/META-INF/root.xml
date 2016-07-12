@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+               http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd
+                   http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-4.2.xsd
+       http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
+
+
+
+
+    <context:component-scan base-package="com.ylitormatech.sensorserver">
+        <context:exclude-filter expression="org.springframework.stereotype.Controller" type="annotation"/>
+    </context:component-scan>
+
+    <bean id="application.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:app.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="packagesToScan" value="com.ylitormatech.sensorserver" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+        </property>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.hbm2ddl.auto">${app.hbm2ddl.auto}</prop>
+                <prop key="hibernate.dialect">${app.hibernate.dialect}</prop>
+
+
+                <prop key="hibernate.connection.useUnicode">true</prop>
+                <prop key="hibernate.connection.characterEncoding">utf8</prop>
+                <prop key="hibernate.connection.charSet">utf8</prop>
+                <prop key="hibernate.hbm2ddl.import_files_sql_extractor">org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${app.db.driver}" />
+        <property name="url" value="${app.db.url}" />
+        <property name="username" value="${app.db.user}" />
+        <property name="password" value="${app.db.password}" />
+        <property name="connectionProperties">
+            <props>
+                <prop key="defaultTransactionIsolation">NONE</prop>
+                <prop key="rollbackOnReturn">false</prop>
+            </props>
+        </property>
+
+    </bean>
+
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="myEmf" />
+    </bean>
+
+    <!-- INTEGRATION TO JMS AND BEARER IS ACTIVEMQ -->
+
+    <!-- Activemq connection factory -->
+    <!--
+    <bean id="amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    -->
+        <!-- brokerURL, You may have different IP or port -->
+    <!--
+    <constructor-arg index="0" value="tcp://127.0.0.1:61616" />
+    </bean>
+-->
+    <!-- Pooled Spring connection factory -->
+<!--
+    <bean id="connectionFactory"
+          class="org.springframework.jms.connection.CachingConnectionFactory">
+        <constructor-arg ref="amqConnectionFactory" />
+    </bean>
+
+
+    <amq:queue name="amqueue" id="amqueue" physicalName="xQ" />
+
+
+    <int-jms:outbound-gateway requires-reply="true"  id="jmsOut" request-destination="amqueue" request-channel="outQueue" />
+
+
+
+    <int:channel id="outQueue" />
+
+
+    <int:gateway default-reply-timeout="10000" service-interface="com.ylitormatech.sensorserver.domain.service.MessageService" default-request-channel="outQueue">
+
+    </int:gateway>
+-->
+    <bean id="HeaderAgentInterceptor" class="com.ylitormatech.sensorserver.utils.headerAgentInterceptor"/>
+    <bean id="clientHttpRequestFactory" class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory"/>
+
+    <bean id="RestTemplate" class="org.springframework.web.client.RestTemplate">
+        <constructor-arg ref="clientHttpRequestFactory"/>
+       <property name="interceptors">
+            <list>
+                <ref bean="HeaderAgentInterceptor"/>
+            </list>
+    </property>
+    </bean>
+
+
+
+</beans>
