@@ -15,9 +15,12 @@ public interface SensorService {
     public SensorEntity findMySensor(Integer id, Integer userid);
 
     public void update(String name,String usage, Integer id, Integer userId);
+    public void restUpdateOnlog(SensorEntity sensorEntity);
+
 
     public void removeMySensor(Integer id, Integer userid);
 
     public List<SensorEntity> restFindAll(Integer userId);
+    public List<SensorEntity> onLogNotSendList();
 
 }

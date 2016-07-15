@@ -20,4 +20,5 @@ public interface SensorRepository {
     void removeMySensor(Integer id, Integer userid);
 
     public List<SensorEntity> restFindAll(Integer userId);
+    public List<SensorEntity> onLogNotSendList();
 }

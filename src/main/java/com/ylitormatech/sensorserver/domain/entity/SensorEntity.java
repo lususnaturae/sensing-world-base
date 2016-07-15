@@ -28,6 +28,9 @@ public class SensorEntity {
 
     Integer userid;
 
+    boolean active = true;
+    boolean onLogSend = false;
+
     public SensorEntity() {
     }
 
@@ -78,6 +81,22 @@ public class SensorEntity {
 
     public void setUserid(Integer userid) {
         this.userid = userid;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isOnLogSend() {
+        return onLogSend;
+    }
+
+    public void setOnLogSend(boolean onLogSend) {
+        this.onLogSend = onLogSend;
     }
 
     @Override

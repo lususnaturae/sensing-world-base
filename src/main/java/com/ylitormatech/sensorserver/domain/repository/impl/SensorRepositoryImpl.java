@@ -38,15 +38,6 @@ public class SensorRepositoryImpl implements SensorRepository{
     }
 
     public SensorEntity restFindIdUserId(Integer id, Integer userId){
-        /*List<SensorEntity> list = em.createQuery("FROM SensorEntity u WHERE u.id=:id AND u.userid=:userId")
-                .setParameter("id",id)
-                .setParameter("userId",userId)
-                .getResultList();
-        if(!list.isEmpty())
-        {
-            return list.get(0);
-        }
-*/
         if(restFindIdUserIdExist(id,userId)){
             return findMySensor(id,userId);
         }
@@ -75,6 +66,13 @@ public class SensorRepositoryImpl implements SensorRepository{
     public List<SensorEntity> restFindAll(Integer userId){
         List<SensorEntity> list = em.createQuery("FROM SensorEntity  WHERE userId=:userId")
                 .setParameter("userId", userId)
+                .getResultList();
+        return list;
+    }
+
+    public List<SensorEntity> onLogNotSendList(){
+        List<SensorEntity> list = em.createQuery("FROM SensorEntity  WHERE onLogSend=:onLogSend")
+                .setParameter("onLogSend", false)
                 .getResultList();
         return list;
     }

@@ -50,6 +50,12 @@ public class SensorServiceImpl implements SensorService{
         sensorRepository.update(s);
     }
 
+
+    public void restUpdateOnlog(SensorEntity sensorEntity) {
+        sensorEntity.setOnLogSend(true);
+        sensorRepository.update(sensorEntity);
+    }
+
     public void removeMySensor(Integer id, Integer userid) {
         sensorRepository.removeMySensor(id, userid);
     }
@@ -57,4 +63,5 @@ public class SensorServiceImpl implements SensorService{
     public List<SensorEntity> restFindAll(Integer userId){
             return sensorRepository.restFindAll(userId);
     }
+    public List<SensorEntity> onLogNotSendList() {return  sensorRepository.onLogNotSendList();}
 }

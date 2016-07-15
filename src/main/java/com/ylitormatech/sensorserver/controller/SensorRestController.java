@@ -3,7 +3,10 @@ package com.ylitormatech.sensorserver.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ylitormatech.sensorserver.domain.entity.SensorEntity;
+import com.ylitormatech.sensorserver.domain.service.JmsService;
+import com.ylitormatech.sensorserver.domain.service.MessageService;
 import com.ylitormatech.sensorserver.domain.service.SensorService;
+import com.ylitormatech.sensorserver.utils.JmsSensor;
 import com.ylitormatech.sensorserver.utils.headerAgentInterceptor;
 import com.ylitormatech.sensorserver.web.SensorForm;
 import com.ylitormatech.sensorserver.web.UserInfo;
@@ -12,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.Message;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -38,9 +43,14 @@ public class SensorRestController {
     @Autowired
     SensorService sensorService;
 
+    @Autowired
+    JmsService jmsService;
+
+
     @RequestMapping(value = "/create", method = RequestMethod.PUT, consumes = "application/json")
     public ResponseEntity<String> createSensor(@RequestHeader("Authorization") String header, @RequestBody @Valid SensorForm sensorForm, BindingResult bindingResult){
         Integer userId;
+        ResponseEntity<String> jmsResponse;
 
         if(bindingResult.hasErrors()){
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -51,8 +61,15 @@ public class SensorRestController {
         if (userId == -1){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
         }
-        sensorService.restAdd(sensorForm.getName(), sensorForm.getUsagetoken(), userId);
-        return ResponseEntity.ok("sensor create");
+        SensorEntity sensorEntity = sensorService.restAdd(sensorForm.getName(), sensorForm.getUsagetoken(), userId);
+
+        jmsResponse = jmsService.newSensor(sensorEntity);
+        if(jmsResponse==null) {
+            sensorService.restUpdateOnlog(sensorEntity);
+            return ResponseEntity.ok("sensor create");
+        }else{
+            return jmsResponse;
+        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -75,7 +92,7 @@ public class SensorRestController {
             json = objectMapper.writeValueAsString(sensor);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("error.json.parsing");
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("{\"error\":\"error.json.parsing\"}");
         }
         return ResponseEntity.ok(json);
     }
@@ -94,6 +111,9 @@ public class SensorRestController {
         if (exist!=true){
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
+
+        /*jms remove*/
+        jmsService.removeSensor(id);
 
         sensorService.removeMySensor(id,userid);
         return ResponseEntity.ok(null);
