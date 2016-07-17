@@ -43,7 +43,7 @@ public class JmsServiceImpl implements JmsService {
 
         jmsSensor.setApikey(sensorEntity.getApikey());
         jmsSensor.setId(sensorEntity.getId());
-        jmsSensor.setDatatype(sensorEntity.getUsagetoken());
+        jmsSensor.setDatatype(sensorEntity.getSensorDatatypes());
 
         try {
             json = objectMapper.writeValueAsString(jmsSensor);
@@ -79,7 +79,7 @@ public class JmsServiceImpl implements JmsService {
 
         jmsSensor.setApikey(sensorEntity.getApikey());
         jmsSensor.setId(sensorEntity.getId());
-        jmsSensor.setDatatype(sensorEntity.getUsagetoken());
+        jmsSensor.setDatatype(sensorEntity.getSensorDatatypes());
 
         try {
             json = objectMapper.writeValueAsString(jmsSensor);

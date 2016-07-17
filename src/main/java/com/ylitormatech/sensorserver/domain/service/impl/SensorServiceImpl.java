@@ -1,6 +1,7 @@
 package com.ylitormatech.sensorserver.domain.service.impl;
 
 import com.ylitormatech.sensorserver.domain.entity.SensorEntity;
+import com.ylitormatech.sensorserver.domain.entity.SensorDatatypeEntity;
 import com.ylitormatech.sensorserver.domain.repository.SensorRepository;
 import com.ylitormatech.sensorserver.domain.service.SensorService;
 import com.ylitormatech.sensorserver.utils.ApiKeyGenerator;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,11 +22,11 @@ public class SensorServiceImpl implements SensorService{
     SensorRepository sensorRepository;
 
 
-    public SensorEntity restAdd(String name, String usage, Integer userId) {
+    public SensorEntity restAdd(String name, List<SensorDatatypeEntity> sensortypes, Integer userId) {
 
         SensorEntity sensorEntity = new SensorEntity();
         sensorEntity.setName(name);
-        sensorEntity.setUsagetoken(usage);
+        sensorEntity.setSensorDatatype(sensortypes);
         sensorEntity.setUserid(userId);
         sensorEntity.setApikey(new ApiKeyGenerator().createNewApiKey(name));
         sensorRepository.add(sensorEntity);
@@ -43,10 +43,10 @@ public class SensorServiceImpl implements SensorService{
         return sensorRepository.findMySensor(id, userid);
     }
 
-    public void update(String name, String usage, Integer id, Integer userId) {
+    public void update(String name, List<SensorDatatypeEntity> sensorTypes, Integer id, Integer userId) {
         SensorEntity s = sensorRepository.findMySensor(id,userId);
         s.setName(name);
-        s.setUsagetoken(usage);
+        s.setSensorDatatype(sensorTypes);
         sensorRepository.update(s);
     }
 

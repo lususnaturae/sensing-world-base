@@ -1,12 +1,16 @@
 package com.ylitormatech.sensorserver.utils;
 
+import com.ylitormatech.sensorserver.domain.entity.SensorDatatypeEntity;
+
+import java.util.List;
+
 /**
  * Created by Perttu Vanharanta on 15.7.2016.
  */
 public class JmsSensor {
     String apikey;
     Integer id;
-    String datatype;
+    List<SensorDatatypeEntity> datatype;
 
     public String getApikey() {
         return apikey;
@@ -24,11 +28,11 @@ public class JmsSensor {
         this.id = id;
     }
 
-    public String getDatatype() {
+    public List<SensorDatatypeEntity> getDatatype() {
         return datatype;
     }
 
-    public void setDatatype(String datatype) {
+    public void setDatatype(List<SensorDatatypeEntity> datatype) {
         this.datatype = datatype;
     }
 }

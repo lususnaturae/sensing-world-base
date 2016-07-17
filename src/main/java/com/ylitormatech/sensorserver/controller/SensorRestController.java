@@ -2,9 +2,11 @@ package com.ylitormatech.sensorserver.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ylitormatech.sensorserver.domain.entity.SensorDatatypeEntity;
 import com.ylitormatech.sensorserver.domain.entity.SensorEntity;
 import com.ylitormatech.sensorserver.domain.service.JmsService;
 import com.ylitormatech.sensorserver.domain.service.MessageService;
+import com.ylitormatech.sensorserver.domain.service.SensorDatatypeService;
 import com.ylitormatech.sensorserver.domain.service.SensorService;
 import com.ylitormatech.sensorserver.utils.JmsSensor;
 import com.ylitormatech.sensorserver.utils.headerAgentInterceptor;
@@ -44,6 +46,10 @@ public class SensorRestController {
     SensorService sensorService;
 
     @Autowired
+    SensorDatatypeService sensorDatatypeService;
+
+
+    @Autowired
     JmsService jmsService;
 
 
@@ -61,7 +67,7 @@ public class SensorRestController {
         if (userId == -1){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
         }
-        SensorEntity sensorEntity = sensorService.restAdd(sensorForm.getName(), sensorForm.getUsagetoken(), userId);
+        SensorEntity sensorEntity = sensorService.restAdd(sensorForm.getName(), sensorForm.getSensorDatatypes(), userId);
 
         jmsResponse = jmsService.newSensor(sensorEntity);
         if(jmsResponse==null) {
@@ -140,7 +146,7 @@ public class SensorRestController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
-        sensorService.update(sensorForm.getName(),sensorForm.getUsagetoken(),id,userId);
+        sensorService.update(sensorForm.getName(),sensorForm.getSensorDatatypes(),id,userId);
         return ResponseEntity.ok(null);
     }
 
@@ -183,5 +189,31 @@ public class SensorRestController {
         System.out.println(userInfo.getId());
         return userInfo.getId();
     }
+
+    @RequestMapping(value = "/datatypelist", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> listSensorDatatypes(@RequestHeader("Authorization") String header) {
+        logger.debug("REST List SensorDatatypeEntity Controller - GET");
+        String json;
+        Integer userid = getUserInfo(header);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        if (userid == -1){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
+        }
+
+        List<SensorDatatypeEntity> sensorDatatypes = sensorDatatypeService.findAll();
+        if(sensorDatatypes.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+        try {
+            json = objectMapper.writeValueAsString(sensorDatatypes);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("error.json.parsing");
+        }
+        return ResponseEntity.ok(json);
+    }
+
+
 
 }

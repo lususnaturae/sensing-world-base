@@ -1,6 +1,9 @@
 package com.ylitormatech.sensorserver.web;
 
+import com.ylitormatech.sensorserver.domain.entity.SensorDatatypeEntity;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import java.util.List;
 
 
 /**
@@ -11,7 +14,7 @@ public class SensorForm {
     @NotEmpty
     String name;
     @NotEmpty
-    String usagetoken;
+    List<SensorDatatypeEntity> sensordatatypes;
 
 
     public String getName() {
@@ -22,12 +25,12 @@ public class SensorForm {
         this.name = name;
     }
 
-    public String getUsagetoken() {
-        return usagetoken;
+    public List<SensorDatatypeEntity> getSensorDatatypes() {
+        return this.sensordatatypes;
     }
 
-    public void setUsagetoken(String usagetoken) {
-        this.usagetoken = usagetoken;
+    public void setUsagetoken(List<SensorDatatypeEntity> sensordatatypes) {
+        this.sensordatatypes = sensordatatypes;
     }
 
 }

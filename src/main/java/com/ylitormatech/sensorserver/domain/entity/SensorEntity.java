@@ -4,6 +4,7 @@ package com.ylitormatech.sensorserver.domain.entity;
 import org.springframework.core.style.ToStringCreator;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by Marco Ylitörmä on 02/05/16.
@@ -20,8 +21,14 @@ public class SensorEntity {
     @Column(length = 40)
     String name;
 
-    @Column(length = 40)
-    String usagetoken;
+    @Column
+    Double lat;
+    @Column
+    Double lon;
+
+
+    @OneToMany
+    List<SensorDatatypeEntity> sensordatatypes;
 
     @Column(length = 100)
     String apikey;
@@ -34,9 +41,9 @@ public class SensorEntity {
     public SensorEntity() {
     }
 
-    public SensorEntity(String name, String usagetoken) {
+    public SensorEntity(String name, List<SensorDatatypeEntity> sensordatatypes) {
         this.name = name;
-        this.usagetoken = usagetoken;
+        this.sensordatatypes = sensordatatypes;
     }
 
     public Integer getId() {
@@ -63,12 +70,28 @@ public class SensorEntity {
         this.name = name;
     }
 
-    public String getUsagetoken() {
-        return usagetoken;
+    public Double getLat() {
+        return lat;
     }
 
-    public void setUsagetoken(String usagetoken) {
-        this.usagetoken = usagetoken;
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
+
+    public Double getLon() {
+        return lon;
+    }
+
+    public void setLon(Double lon) {
+        this.lon = lon;
+    }
+
+    public List<SensorDatatypeEntity> getSensorDatatypes() {
+        return sensordatatypes;
+    }
+
+    public void setSensorDatatype(List<SensorDatatypeEntity> sensortypes) {
+        this.sensordatatypes = sensortypes;
     }
 
     public boolean isNew() {
@@ -106,7 +129,6 @@ public class SensorEntity {
                 .append("id", this.getId())
                 .append("new", this.isNew())
                 .append("name", this.getName())
-                .append("usagetokem", this.getUsagetoken())
                 .toString();
     }
 }
