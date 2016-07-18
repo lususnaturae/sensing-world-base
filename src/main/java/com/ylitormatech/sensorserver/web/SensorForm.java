@@ -25,12 +25,14 @@ public class SensorForm {
         this.name = name;
     }
 
-    public List<SensorDatatypeEntity> getSensorDatatypes() {
-        return this.sensordatatypes;
+
+
+
+    public List<SensorDatatypeEntity> getSensordatatypes() {
+        return sensordatatypes;
     }
 
-    public void setUsagetoken(List<SensorDatatypeEntity> sensordatatypes) {
+    public void setSensordatatypes(List<SensorDatatypeEntity> sensordatatypes) {
         this.sensordatatypes = sensordatatypes;
     }
-
 }

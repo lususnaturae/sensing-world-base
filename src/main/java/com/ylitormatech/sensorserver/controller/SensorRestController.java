@@ -67,7 +67,7 @@ public class SensorRestController {
         if (userId == -1){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
         }
-        SensorEntity sensorEntity = sensorService.restAdd(sensorForm.getName(), sensorForm.getSensorDatatypes(), userId);
+        SensorEntity sensorEntity = sensorService.restAdd(sensorForm.getName(), sensorForm.getSensordatatypes(), userId);
 
         jmsResponse = jmsService.newSensor(sensorEntity);
         if(jmsResponse==null) {
@@ -146,7 +146,7 @@ public class SensorRestController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
-        sensorService.update(sensorForm.getName(),sensorForm.getSensorDatatypes(),id,userId);
+        sensorService.update(sensorForm.getName(),sensorForm.getSensordatatypes(),id,userId);
         return ResponseEntity.ok(null);
     }
 
