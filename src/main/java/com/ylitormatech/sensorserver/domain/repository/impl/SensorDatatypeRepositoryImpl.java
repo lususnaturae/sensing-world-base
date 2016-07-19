@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  * Created by marco on 17.7.2016.
  */
 @Repository("sensorDatatypeRepository")
-@Transactional
+
 public class SensorDatatypeRepositoryImpl  implements SensorDatatypeRepository{
 
     @PersistenceContext
@@ -42,6 +43,14 @@ public class SensorDatatypeRepositoryImpl  implements SensorDatatypeRepository{
                     .getResultList();
         }
         return list;
+
+    }
+
+    public SensorDatatypeEntity findByName(String name){
+        Query query = em.createQuery("FROM SensorDatatypeEntity WHERE name=:name");
+        query.setParameter("name", name);
+
+        return (SensorDatatypeEntity) query.getSingleResult();
 
     }
 }

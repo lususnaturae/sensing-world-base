@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Marco Ylitörmä on 02/05/16.
  */
 @Repository("sensorRepository")
-@Transactional
+
 public class SensorRepositoryImpl implements SensorRepository{
 
     @PersistenceContext

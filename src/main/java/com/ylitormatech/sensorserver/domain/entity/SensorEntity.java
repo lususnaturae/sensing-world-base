@@ -1,6 +1,7 @@
 package com.ylitormatech.sensorserver.domain.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.core.style.ToStringCreator;
 
 import javax.persistence.*;
@@ -27,7 +28,12 @@ public class SensorEntity {
     Double lon;
 
 
-    @OneToMany
+    @ManyToMany(cascade =CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name="TrainedMonkeys",
+            joinColumns = @JoinColumn( name="trainer_id"),
+            inverseJoinColumns = @JoinColumn( name="monkey_id")
+    )
     List<SensorDatatypeEntity> sensordatatypes;
 
     @Column(length = 100)

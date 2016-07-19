@@ -6,20 +6,22 @@ import com.ylitormatech.sensorserver.domain.repository.SensorRepository;
 import com.ylitormatech.sensorserver.domain.service.SensorDatatypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+
 import java.util.List;
 
 /**
  * Created by marco on 17.7.2016.
  */
 @Service("sensorDatatypeService")
-@Transactional
+
 public class SensorDatatypeServiceImpl implements SensorDatatypeService {
 
     @Autowired
     SensorDatatypeRepository sensorDatatypeRepository;
 
+    @Transactional(readOnly = false)
     public List<SensorDatatypeEntity> findAll() {
         return sensorDatatypeRepository.findAll();
     }

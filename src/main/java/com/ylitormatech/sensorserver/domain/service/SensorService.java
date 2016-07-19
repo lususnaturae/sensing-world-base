@@ -2,6 +2,7 @@ package com.ylitormatech.sensorserver.domain.service;
 
 import com.ylitormatech.sensorserver.domain.entity.SensorEntity;
 import com.ylitormatech.sensorserver.domain.entity.SensorDatatypeEntity;
+import com.ylitormatech.sensorserver.web.SensorDataTypeForm;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  */
 public interface SensorService {
 
-    public SensorEntity restAdd(String name, List<SensorDatatypeEntity> sensorTypes, Integer userId);
+    public SensorEntity restAdd(String name, List<SensorDataTypeForm> sensorTypes, Integer userId);
 
     public boolean restFindExist(Integer id, Integer userId);
     public SensorEntity restFind(Integer id, Integer userId);
