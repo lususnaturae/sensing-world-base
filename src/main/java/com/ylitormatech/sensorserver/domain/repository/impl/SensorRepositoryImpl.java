@@ -57,10 +57,12 @@ public class SensorRepositoryImpl implements SensorRepository{
     }
 
     public void removeMySensor(Integer id, Integer userId) {
-        Query query = em.createQuery("FROM SensorEntity WHERE id=:id and userId=:userId");
+        /*Query query = em.createQuery("FROM SensorEntity WHERE id=:id and userId=:userId");
         query.setParameter("id", id);
-        query.setParameter("userId", userId);
-        em.remove((SensorEntity) query.getSingleResult());
+        query.setParameter("userId", userId);*/
+        SensorEntity sensorEntity= findMySensor(id, userId);
+        sensorEntity.getSensorDatatypeEntities().clear();
+        em.remove(sensorEntity);
     }
 
     public List<SensorEntity> restFindAll(Integer userId){

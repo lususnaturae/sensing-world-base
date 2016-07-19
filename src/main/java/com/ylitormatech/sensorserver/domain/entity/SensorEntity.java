@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.core.style.ToStringCreator;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Marco Ylitörmä on 02/05/16.
@@ -30,12 +30,17 @@ public class SensorEntity {
 
     @ManyToMany(cascade =CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
-            name="TrainedMonkeys",
+            name="Team_Player",
+            joinColumns=@JoinColumn(name="sensorId", referencedColumnName="id"),
+            inverseJoinColumns=@JoinColumn(name="datatypes_id", referencedColumnName="id"))
+
+
+            /*name="TrainedMonkeys",
             joinColumns = @JoinColumn( name="trainer_id"),
             inverseJoinColumns = @JoinColumn( name="monkey_id")
-    )
-    List<SensorDatatypeEntity> sensordatatypes;
-
+    )*/
+//    List<SensorDatatypeEntity> sensordatatypes;
+    Set<SensorDatatypeEntity> sensorDatatypeEntities = new HashSet<SensorDatatypeEntity>();
     @Column(length = 100)
     String apikey;
 
@@ -46,12 +51,12 @@ public class SensorEntity {
 
     public SensorEntity() {
     }
-
+/*
     public SensorEntity(String name, List<SensorDatatypeEntity> sensordatatypes) {
         this.name = name;
         this.sensordatatypes = sensordatatypes;
     }
-
+*/
     public Integer getId() {
         return id;
     }
@@ -91,13 +96,22 @@ public class SensorEntity {
     public void setLon(Double lon) {
         this.lon = lon;
     }
-
+/*
     public List<SensorDatatypeEntity> getSensorDatatypes() {
         return sensordatatypes;
     }
 
     public void setSensorDatatype(List<SensorDatatypeEntity> sensortypes) {
         this.sensordatatypes = sensortypes;
+    }
+*/
+
+    public Set<SensorDatatypeEntity> getSensorDatatypeEntities() {
+        return sensorDatatypeEntities;
+    }
+
+    public void setSensorDatatypeEntities(Set<SensorDatatypeEntity> sensorDatatypeEntities) {
+        this.sensorDatatypeEntities = sensorDatatypeEntities;
     }
 
     public boolean isNew() {

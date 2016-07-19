@@ -3,6 +3,7 @@ package com.ylitormatech.sensorserver.utils;
 import com.ylitormatech.sensorserver.domain.entity.SensorDatatypeEntity;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Perttu Vanharanta on 15.7.2016.
@@ -10,7 +11,8 @@ import java.util.List;
 public class JmsSensor {
     String apikey;
     Integer id;
-    List<SensorDatatypeEntity> datatype;
+    Set<SensorDatatypeEntity> datatype;
+    //List<SensorDatatypeEntity> datatype;
 
     public String getApikey() {
         return apikey;
@@ -28,6 +30,15 @@ public class JmsSensor {
         this.id = id;
     }
 
+    public Set<SensorDatatypeEntity> getDatatype() {
+        return datatype;
+    }
+
+    public void setDatatype(Set<SensorDatatypeEntity> datatype) {
+        this.datatype = datatype;
+    }
+
+    /*
     public List<SensorDatatypeEntity> getDatatype() {
         return datatype;
     }
@@ -35,4 +46,5 @@ public class JmsSensor {
     public void setDatatype(List<SensorDatatypeEntity> datatype) {
         this.datatype = datatype;
     }
+*/
 }

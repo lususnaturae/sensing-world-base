@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Marco Ylitörmä on 02/05/16.
@@ -30,14 +32,14 @@ public class SensorServiceImpl implements SensorService{
     public SensorEntity restAdd(String name, List<SensorDataTypeForm> sensortypes, Integer userId) {
 
         SensorEntity sensorEntity = new SensorEntity();
-        List<SensorDatatypeEntity> sensorDatatypeEntityList = new ArrayList<SensorDatatypeEntity>();
+        Set<SensorDatatypeEntity> sensorDatatypeEntityList = new HashSet<SensorDatatypeEntity>();
 
         for (SensorDataTypeForm entity:sensortypes) {
             sensorDatatypeEntityList.add(sensorDatatypeRepository.findByName(entity.getName()));
         }
 
         sensorEntity.setName(name);
-        sensorEntity.setSensorDatatype(sensorDatatypeEntityList);
+        sensorEntity.setSensorDatatypeEntities(sensorDatatypeEntityList);// setSensorDatatype(sensorDatatypeEntityList);
         sensorEntity.setUserid(userId);
         sensorEntity.setApikey(new ApiKeyGenerator().createNewApiKey(name));
         sensorRepository.add(sensorEntity);
@@ -63,7 +65,7 @@ public class SensorServiceImpl implements SensorService{
     public void update(String name, List<SensorDatatypeEntity> sensorTypes, Integer id, Integer userId) {
         SensorEntity s = sensorRepository.findMySensor(id,userId);
         s.setName(name);
-        s.setSensorDatatype(sensorTypes);
+        //s.setSensorDatatype(sensorTypes);
         sensorRepository.update(s);
     }
 
