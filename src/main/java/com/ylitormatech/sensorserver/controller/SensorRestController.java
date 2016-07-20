@@ -65,17 +65,26 @@ public class SensorRestController {
 
         userId = getUserInfo(header);
         if (userId == -1){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"error\":\"sensor.create.error.invalid.user\"}");
         }
-        SensorEntity sensorEntity = sensorService.restAdd(sensorForm.getName(), sensorForm.getSensordatatypes(), userId);
 
-        jmsResponse = jmsService.newSensor(sensorEntity);
-        if(jmsResponse==null) {
-            sensorService.restUpdateOnlog(sensorEntity);
-            return ResponseEntity.ok("sensor create");
-        }else{
-            return jmsResponse;
+        if(sensorService.restFindIsSensorNameExist(sensorForm.getName(),userId)) {
+            if(sensorDatatypeService.isDatatypesValid(sensorForm.getSensordatatypes())) {
+                SensorEntity sensorEntity = sensorService.restAdd(sensorForm.getName(), sensorForm.getSensordatatypes(), userId);
+                jmsResponse = jmsService.newSensor(sensorEntity);
+                if (jmsResponse == null) {
+                    sensorService.restUpdateOnlog(sensorEntity);
+                    return ResponseEntity.ok("sensor create");
+                } else {
+                    return jmsResponse;
+                }
+            }
+            return  ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body("{\"error\":\"sensor.create.error.invalid.datatype\"}");
         }
+        return  ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body("{\"error\":\"sensor.create.error.sensor.name.exist\"}");
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,7 +95,8 @@ public class SensorRestController {
         ObjectMapper objectMapper = new ObjectMapper();
 
         if (userId == -1){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"error\":\"sensor.get.error.invalid.user\"}");
         }
 
         SensorEntity sensor = sensorService.restFind(id,userId);
@@ -98,7 +108,7 @@ public class SensorRestController {
             json = objectMapper.writeValueAsString(sensor);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("{\"error\":\"error.json.parsing\"}");
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("{\"error\":\"sensor.get.error.json.parsing\"}");
         }
         return ResponseEntity.ok(json);
     }
@@ -106,38 +116,11 @@ public class SensorRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public  ResponseEntity<String> deleteSensor(@RequestHeader("Authorization") String header,@PathVariable("id") Integer id) {
         logger.debug("Delete SensorEntity Controller - DELETE");
-        Integer userid = getUserInfo(header);
+        Integer userId = getUserInfo(header);
 
-        if (userid == -1){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
-        }
-
-        boolean exist = sensorService.restFindExist(id,userid);
-
-        if (exist!=true){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-        }
-
-        /*jms remove*/
-        jmsService.removeSensor(id);
-
-        sensorService.removeMySensor(id,userid);
-        return ResponseEntity.ok(null);
-    }
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseEntity<String> updateSensor(@RequestHeader("Authorization") String header,@PathVariable("id") Integer id, @RequestBody @Valid SensorForm sensorForm, BindingResult bindingResult) {
-        logger.debug("Update SensorEntity Controller - POST");
-        Integer userId;
-
-        if(bindingResult.hasErrors()){
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                    .body("{\"error\":\"sensor.create.error.missing.value\"}");
-        }
-
-        userId = getUserInfo(header);
         if (userId == -1){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"error\":\"sensor.delete.error.invalid.user\"}");
         }
 
         boolean exist = sensorService.restFindExist(id,userId);
@@ -146,8 +129,55 @@ public class SensorRestController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
-        //sensorService.update(sensorForm.getName(),sensorForm.getSensorDatatypes(),id,userId);
+        /*jms remove*/
+        if(sensorService.restIsSentToOnLog(id,userId)) {
+            jmsService.removeSensor(id);
+        }
+        sensorService.removeMySensor(id,userId);
         return ResponseEntity.ok(null);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.POST, consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateSensor(@RequestHeader("Authorization") String header,@PathVariable("id") Integer id, @RequestBody @Valid SensorForm sensorForm, BindingResult bindingResult) {
+        logger.debug("Update SensorEntity Controller - POST");
+        Integer userId;
+
+        if(bindingResult.hasErrors()){
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body("{\"error\":\"sensor.update.error.missing.value\"}");
+        }
+
+        userId = getUserInfo(header);
+        if (userId == -1){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"error\":\"sensor.update.error.invalid.user\"}");
+        }
+
+        boolean exist = sensorService.restFindExist(id,userId);
+
+        if (exist!=true){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        if(sensorService.restFindIsSensorNameEquals(sensorForm.getName(), id, userId)){
+            if(sensorDatatypeService.isDatatypesValid(sensorForm.getSensordatatypes())) {
+                sensorService.update(sensorForm.getName(),sensorForm.getSensordatatypes(),id,userId);
+                return ResponseEntity.ok(null);
+            }
+            return  ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body("{\"error\":\"sensor.update.error.invalid.datatype\"}");
+        }
+        if(sensorService.restFindIsSensorNameExist(sensorForm.getName(),userId)) {
+            if(sensorDatatypeService.isDatatypesValid(sensorForm.getSensordatatypes())) {
+                sensorService.update(sensorForm.getName(),sensorForm.getSensordatatypes(),id,userId);
+                return ResponseEntity.ok(null);
+                }
+
+            return  ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body("{\"error\":\"sensor.update.error.invalid.datatype\"}");
+        }
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body("{\"error\":\"sensor.update.error.sensor.name.exist\"}");
     }
 
 
@@ -159,7 +189,8 @@ public class SensorRestController {
         ObjectMapper objectMapper = new ObjectMapper();
 
         if (userid == -1){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"error\":\"sensor.list.error.invalid.user\"}");
         }
 
         List<SensorEntity> sensors = sensorService.restFindAll(userid);
@@ -170,7 +201,8 @@ public class SensorRestController {
             json = objectMapper.writeValueAsString(sensors);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("error.json.parsing");
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body("{\"error\":\"sensor.list.error.json.parsing\"}");
         }
         return ResponseEntity.ok(json);    }
 

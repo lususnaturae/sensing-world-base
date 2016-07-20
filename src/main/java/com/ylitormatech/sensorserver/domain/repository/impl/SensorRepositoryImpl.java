@@ -44,6 +44,19 @@ public class SensorRepositoryImpl implements SensorRepository{
         return null;
     }
 
+
+    public boolean restFindNameUserIdExist(String name, Integer userId) {
+        List<SensorEntity> list = em.createQuery("FROM SensorEntity u WHERE u.name=:name AND u.userid=:userId")
+                .setParameter("name",name)
+                .setParameter("userId",userId)
+                .getResultList();
+        if(!list.isEmpty())
+        {
+            return false;
+        }
+        return true;
+    }
+
     public SensorEntity findMySensor(Integer id, Integer userId) {
         Query query = em.createQuery("FROM SensorEntity WHERE id=:id AND userId=:userId");
         query.setParameter("id", id);

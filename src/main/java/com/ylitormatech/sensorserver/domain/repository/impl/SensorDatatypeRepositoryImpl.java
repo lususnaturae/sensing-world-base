@@ -53,4 +53,15 @@ public class SensorDatatypeRepositoryImpl  implements SensorDatatypeRepository{
         return (SensorDatatypeEntity) query.getSingleResult();
 
     }
+
+    public boolean isDatatypeValid(String name) {
+        List<SensorDatatypeEntity> list = em.createQuery("FROM SensorDatatypeEntity u WHERE u.name=:name")
+                .setParameter("name",name)
+                .getResultList();
+        if(!list.isEmpty())
+        {
+            return true;
+        }
+        return false;
+    }
 }

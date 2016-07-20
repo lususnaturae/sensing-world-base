@@ -52,6 +52,26 @@ public class SensorServiceImpl implements SensorService{
     }
 
     @Transactional(readOnly = true)
+    public boolean restFindIsSensorNameExist(String name, Integer userId) {
+        return sensorRepository.restFindNameUserIdExist(name, userId);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean restFindIsSensorNameEquals(String name, Integer id, Integer userId) {
+        SensorEntity sensorEntity = sensorRepository.findMySensor(id,userId);
+        if(sensorEntity.getName().equals(name)){
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean restIsSentToOnLog(Integer id, Integer userId) {
+        SensorEntity sensorEntity = sensorRepository.findMySensor(id, userId);
+        return sensorEntity.isOnLogSend();
+    }
+
+    @Transactional(readOnly = true)
     public SensorEntity restFind(Integer id, Integer userId){
         return sensorRepository.restFindIdUserId(id, userId);
     }
@@ -62,10 +82,17 @@ public class SensorServiceImpl implements SensorService{
     }
 
     @Transactional(readOnly = false)
-    public void update(String name, List<SensorDatatypeEntity> sensorTypes, Integer id, Integer userId) {
+    public void update(String name, List<SensorDataTypeForm> sensortypes, Integer id, Integer userId) {
         SensorEntity s = sensorRepository.findMySensor(id,userId);
+
+        Set<SensorDatatypeEntity> sensorDatatypeEntityList = new HashSet<SensorDatatypeEntity>();
+        for (SensorDataTypeForm entity: sensortypes) {
+            sensorDatatypeEntityList.add(sensorDatatypeRepository.findByName(entity.getName()));
+        }
+
+        s.getSensorDatatypeEntities().clear();
         s.setName(name);
-        //s.setSensorDatatype(sensorTypes);
+        s.setSensorDatatypeEntities(sensorDatatypeEntityList);
         sensorRepository.update(s);
     }
 

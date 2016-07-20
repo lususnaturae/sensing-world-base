@@ -12,6 +12,7 @@ public interface SensorRepository {
     public void add(SensorEntity sensorEntity);
 
     public boolean restFindIdUserIdExist(Integer id, Integer userId);
+    public boolean restFindNameUserIdExist(String name, Integer userId);
     public SensorEntity restFindIdUserId(Integer id, Integer userId);
     SensorEntity findMySensor(Integer id, Integer userid);
 

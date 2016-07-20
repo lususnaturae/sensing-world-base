@@ -14,10 +14,14 @@ public interface SensorService {
     public SensorEntity restAdd(String name, List<SensorDataTypeForm> sensorTypes, Integer userId);
 
     public boolean restFindExist(Integer id, Integer userId);
+    public boolean restFindIsSensorNameExist(String name, Integer userId);
+    public boolean restFindIsSensorNameEquals(String name, Integer id, Integer userId);
+    public boolean restIsSentToOnLog(Integer id, Integer userId);
+
     public SensorEntity restFind(Integer id, Integer userId);
     public SensorEntity findMySensor(Integer id, Integer userid);
 
-    public void update(String name, List<SensorDatatypeEntity>sensorTypes, Integer id, Integer userId);
+    public void update(String name, List<SensorDataTypeForm>sensorTypes, Integer id, Integer userId);
     public void restUpdateOnlog(SensorEntity sensorEntity);
 
 

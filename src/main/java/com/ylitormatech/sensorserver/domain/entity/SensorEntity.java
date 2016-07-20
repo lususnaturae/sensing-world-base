@@ -30,7 +30,7 @@ public class SensorEntity {
 
     @ManyToMany(cascade =CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
-            name="Team_Player",
+            name="SensorId_DatatypeID",
             joinColumns=@JoinColumn(name="sensorId", referencedColumnName="id"),
             inverseJoinColumns=@JoinColumn(name="datatypes_id", referencedColumnName="id"))
 
