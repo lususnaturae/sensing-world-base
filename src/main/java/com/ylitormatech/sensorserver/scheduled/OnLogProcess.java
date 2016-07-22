@@ -31,7 +31,7 @@ public class OnLogProcess {
     @Autowired
     SensorService sensorService;
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 */3 * * * ?")
     public void sendOnLogSensor(){
         List<SensorEntity> lists = sensorService.onLogNotSendList();
         System.out.println("Scheluded - sendOnLogSensor");
@@ -47,7 +47,7 @@ public class OnLogProcess {
 
     }
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 */3 * * * ?")
     public void sendOnLogRemoves() {
         List<OnLogRemoveEntity> lists = onLogRemoveService.findRemoveList();
 

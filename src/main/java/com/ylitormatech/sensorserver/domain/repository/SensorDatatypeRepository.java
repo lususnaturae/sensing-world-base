@@ -9,4 +9,6 @@ import java.util.List;
  */
 public interface SensorDatatypeRepository {
     public List<SensorDatatypeEntity> findAll();
+    public SensorDatatypeEntity findByName(String name);
+    public boolean isDatatypeValid(String name);
 }

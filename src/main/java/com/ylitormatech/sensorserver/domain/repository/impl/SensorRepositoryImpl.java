@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Marco Ylitörmä on 02/05/16.
  */
 @Repository("sensorRepository")
-@Transactional
+
 public class SensorRepositoryImpl implements SensorRepository{
 
     @PersistenceContext
@@ -44,6 +44,19 @@ public class SensorRepositoryImpl implements SensorRepository{
         return null;
     }
 
+
+    public boolean restFindNameUserIdExist(String name, Integer userId) {
+        List<SensorEntity> list = em.createQuery("FROM SensorEntity u WHERE u.name=:name AND u.userid=:userId")
+                .setParameter("name",name)
+                .setParameter("userId",userId)
+                .getResultList();
+        if(!list.isEmpty())
+        {
+            return false;
+        }
+        return true;
+    }
+
     public SensorEntity findMySensor(Integer id, Integer userId) {
         Query query = em.createQuery("FROM SensorEntity WHERE id=:id AND userId=:userId");
         query.setParameter("id", id);
@@ -57,10 +70,9 @@ public class SensorRepositoryImpl implements SensorRepository{
     }
 
     public void removeMySensor(Integer id, Integer userId) {
-        Query query = em.createQuery("FROM SensorEntity WHERE id=:id and userId=:userId");
-        query.setParameter("id", id);
-        query.setParameter("userId", userId);
-        em.remove((SensorEntity) query.getSingleResult());
+        SensorEntity sensorEntity= findMySensor(id, userId);
+        sensorEntity.getSensorDatatypeEntities().clear();
+        em.remove(sensorEntity);
     }
 
     public List<SensorEntity> restFindAll(Integer userId){
