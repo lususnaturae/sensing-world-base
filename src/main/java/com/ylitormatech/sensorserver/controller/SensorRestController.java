@@ -5,20 +5,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ylitormatech.sensorserver.domain.entity.SensorDatatypeEntity;
 import com.ylitormatech.sensorserver.domain.entity.SensorEntity;
 import com.ylitormatech.sensorserver.domain.service.JmsService;
-import com.ylitormatech.sensorserver.domain.service.MessageService;
 import com.ylitormatech.sensorserver.domain.service.SensorDatatypeService;
 import com.ylitormatech.sensorserver.domain.service.SensorService;
-import com.ylitormatech.sensorserver.utils.JmsSensor;
 import com.ylitormatech.sensorserver.utils.headerAgentInterceptor;
 import com.ylitormatech.sensorserver.web.SensorForm;
 import com.ylitormatech.sensorserver.web.UserInfo;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.integration.support.MessageBuilder;
-import org.springframework.messaging.Message;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -34,7 +31,9 @@ import java.util.List;
 public class SensorRestController {
 
     Logger logger = Logger.getLogger(this.getClass().getName());
-    public final String uri = "http://localhost:8080/user/id";
+
+    @Value(value = "${app.auth.url}")
+    public String uri;
 
     @Autowired
     private RestTemplate restTemplate;

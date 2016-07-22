@@ -31,6 +31,7 @@
         </property>
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
         <property name="ignoreResourceNotFound" value="true"/>
+        <property name="environment" ref="environment"/>
     </bean>
 
     <bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -82,7 +83,7 @@
 
         <!-- brokerURL, You may have different IP or port -->
 
-    <constructor-arg index="0" value="tcp://127.0.0.1:61616" />
+    <constructor-arg index="0" value="${activemq.tcp}" />
     </bean>
 
     <!-- Pooled Spring connection factory -->

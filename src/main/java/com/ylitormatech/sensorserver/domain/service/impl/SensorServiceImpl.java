@@ -39,7 +39,7 @@ public class SensorServiceImpl implements SensorService{
         }
 
         sensorEntity.setName(name);
-        sensorEntity.setSensorDatatypeEntities(sensorDatatypeEntityList);// setSensorDatatype(sensorDatatypeEntityList);
+        sensorEntity.setSensorDatatypeEntities(sensorDatatypeEntityList);
         sensorEntity.setUserid(userId);
         sensorEntity.setApikey(new ApiKeyGenerator().createNewApiKey(name));
         sensorRepository.add(sensorEntity);
