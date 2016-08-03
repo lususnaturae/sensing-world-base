@@ -5,20 +5,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ylitormatech.sensorserver.domain.entity.SensorDatatypeEntity;
 import com.ylitormatech.sensorserver.domain.entity.SensorEntity;
 import com.ylitormatech.sensorserver.domain.service.JmsService;
+import com.ylitormatech.sensorserver.domain.service.RestService;
 import com.ylitormatech.sensorserver.domain.service.SensorDatatypeService;
 import com.ylitormatech.sensorserver.domain.service.SensorService;
-import com.ylitormatech.sensorserver.utils.headerAgentInterceptor;
 import com.ylitormatech.sensorserver.web.SensorForm;
-import com.ylitormatech.sensorserver.web.UserInfo;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -32,24 +29,17 @@ public class SensorRestController {
 
     Logger logger = Logger.getLogger(this.getClass().getName());
 
-    @Value(value = "${app.auth.url}")
-    public String uri;
-
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
-    private headerAgentInterceptor headerAgentInterceptor;
-
     @Autowired
     SensorService sensorService;
 
     @Autowired
     SensorDatatypeService sensorDatatypeService;
 
-
     @Autowired
     JmsService jmsService;
+
+    @Autowired
+    RestService restService;
 
 
     @RequestMapping(value = "/create", method = RequestMethod.PUT, consumes = "application/json")
@@ -62,7 +52,7 @@ public class SensorRestController {
                     .body("{\"error\":\"sensor.create.error.missing.value\"}");
         }
 
-        userId = getUserInfo(header);
+        userId = restService.getUserInfo(header);
         if (userId == -1){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
         }
@@ -91,7 +81,7 @@ public class SensorRestController {
     public  ResponseEntity<String> showSensor(@RequestHeader("Authorization") String header,@PathVariable("id") Integer id) {
         logger.debug("Show SensorEntity Controller - GET");
         String json;
-        Integer userId = getUserInfo(header);
+        Integer userId = restService.getUserInfo(header);
         ObjectMapper objectMapper = new ObjectMapper();
 
         if (userId == -1){
@@ -116,7 +106,7 @@ public class SensorRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public  ResponseEntity<String> deleteSensor(@RequestHeader("Authorization") String header,@PathVariable("id") Integer id) {
         logger.debug("Delete SensorEntity Controller - DELETE");
-        Integer userId = getUserInfo(header);
+        Integer userId = restService.getUserInfo(header);
 
         if (userId == -1){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -147,7 +137,7 @@ public class SensorRestController {
                     .body("{\"error\":\"sensor.update.error.missing.value\"}");
         }
 
-        userId = getUserInfo(header);
+        userId = restService.getUserInfo(header);
         if (userId == -1){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("{\"error\":\"sensor.update.error.invalid.user\"}");
@@ -185,7 +175,7 @@ public class SensorRestController {
     public ResponseEntity<String> listSensors(@RequestHeader("Authorization") String header) {
         logger.debug("REST List SensorEntity Controller - GET");
         String json;
-        Integer userid = getUserInfo(header);
+        Integer userid = restService.getUserInfo(header);
         ObjectMapper objectMapper = new ObjectMapper();
 
         if (userid == -1){
@@ -207,26 +197,12 @@ public class SensorRestController {
         return ResponseEntity.ok(json);    }
 
 
-    private Integer getUserInfo(String header){
-        UserInfo userInfo;
-
-        headerAgentInterceptor.setBearer(header);
-
-        try {
-            userInfo = restTemplate.getForObject(uri, UserInfo.class);
-        }catch (Exception e) {
-            logger.error(e.getMessage());
-            return -1;
-        }
-        System.out.println(userInfo.getId());
-        return userInfo.getId();
-    }
 
     @RequestMapping(value = "/datatypelist", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> listSensorDatatypes(@RequestHeader("Authorization") String header) {
         logger.debug("REST List SensorDatatypeEntity Controller - GET");
         String json;
-        Integer userid = getUserInfo(header);
+        Integer userid = restService.getUserInfo(header);
         ObjectMapper objectMapper = new ObjectMapper();
 
         if (userid == -1){
