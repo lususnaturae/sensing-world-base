@@ -8,6 +8,7 @@ import com.ylitormatech.sensorserver.domain.service.JmsService;
 import com.ylitormatech.sensorserver.domain.service.RestService;
 import com.ylitormatech.sensorserver.domain.service.SensorDatatypeService;
 import com.ylitormatech.sensorserver.domain.service.SensorService;
+import com.ylitormatech.sensorserver.web.SensorDataTypeForm;
 import com.ylitormatech.sensorserver.web.SensorForm;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +57,9 @@ public class SensorRestController {
         if (userId == -1){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
         }
-        //SensorEntity sensorEntity = sensorService.restAdd(sensorForm.getName(), sensorForm.getSensordatatypes(), userId);
 
         if(sensorService.restFindIsSensorNameExist(sensorForm.getName(),userId)) {
+
             if(sensorDatatypeService.isDatatypesValid(sensorForm.getSensordatatypes())) {
                 SensorEntity sensorEntity = sensorService.restAdd(sensorForm.getName(), sensorForm.getSensordatatypes(), userId);
                 jmsResponse = jmsService.newSensor(sensorEntity);
@@ -69,12 +70,13 @@ public class SensorRestController {
                     return jmsResponse;
                 }
             }
+
             return  ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                     .body("{\"error\":\"sensor.create.error.invalid.datatype\"}");
         }
+
         return  ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body("{\"error\":\"sensor.create.error.sensor.name.exist\"}");
-
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
