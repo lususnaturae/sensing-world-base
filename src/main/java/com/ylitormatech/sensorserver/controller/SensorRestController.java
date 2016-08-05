@@ -208,7 +208,8 @@ public class SensorRestController {
         ObjectMapper objectMapper = new ObjectMapper();
 
         if (userid == -1){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"error\":\"sensor.datatypelist.error.invalid.user\"}");
         }
 
         List<SensorDatatypeEntity> sensorDatatypes = sensorDatatypeService.findAll();
@@ -219,7 +220,7 @@ public class SensorRestController {
             json = objectMapper.writeValueAsString(sensorDatatypes);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("error.json.parsing");
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("{\"error\":\"error.datatypelist.json.parsing\"}");
         }
         return ResponseEntity.ok(json);
     }
